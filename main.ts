@@ -21,6 +21,9 @@ namespace LifeSimulator {
         ) {
             super(image.create(0, 0));
             this.setKind(CritterKind);
+            this.setFlag(SpriteFlag.BounceOnWall, true);
+            
+            this.lifespan = this.timeToLive;
             this.gender = randint(1, 2) == 1 ? Gender.MALE : Gender.FEMALE;
 
             if (this.gender == Gender.MALE) {
@@ -29,11 +32,12 @@ namespace LifeSimulator {
                 this.setImage(assets.image`cFemale`);
             }
 
-            this.lifespan = this.timeToLive;
+            SimManager.totalCritters++;
+            this.init();
+        }
 
+        public init() {
             replaceColor(this.image, 1, this.color);
-
-            this.setFlag(SpriteFlag.BounceOnWall, true);
 
             forever(() => { // Movement
                 this.setVelocity(
@@ -48,18 +52,16 @@ namespace LifeSimulator {
                     this.breedCooldown--;
                 }
             });
-
-            SimManager.totalCritters++;
         }
 
         public static reproduceIfPossible(parentOne: CritterSprite, parentTwo: CritterSprite) {
             if (parentOne.breedCooldown <= 0 && parentTwo.breedCooldown <= 0) {
                 for (let i = 0; i < parentOne.breedPower; i++) {
                     const avSpeed = (parentOne.speed + parentTwo.speed) / 2 + randint(-20, 20);
-                    const avAth = (parentOne.athletics + parentTwo.athletics) / 2 + randint(-40, 40);
+                    const avAth = (parentOne.athletics + parentTwo.athletics) / 2 + randint(-100, 100);
 
                     const offspring = SimManager.getOrCreate(
-                        randint(1, 2) ? randint(1, 2) == 1 ? parentOne.color : parentTwo.color : randint(1, 14),
+                        randint(1, 3) == 1 ? randint(1, 2) == 1 ? parentOne.color : parentTwo.color : randint(1, 14),
                         avSpeed,
                         avAth,
                         randint(1000, 50000),
